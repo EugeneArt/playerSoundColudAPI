@@ -3,6 +3,7 @@
 			playlist = document.querySelector('[data-state="playlist"]'),
 			playlistTop = document.querySelector('[data-state="playlist"] .top'),
 			browse = document.querySelector('[data-state="browse"]'),
+			// login = document.querySelector('[data-state="login"]'),
 			
 
 			menuToggles = document.querySelectorAll('[data-menu="toggle"]'),
@@ -25,6 +26,10 @@
 			togglePlayerUp = function () {
 				player.style.webkitTransform = player.style.webkitTransform ? '' : 'translateY(-100%)';
 			},
+			
+			// toggleLoginUp = function () {
+			// 	login.style.webkitTransform = login.style.webkitTransform ? '' : 'translateY(100%)';
+			// },
 
 			toggleMenu = function () {
 				browse.style.webkitTransform = browse.style.webkitTransform ? '' : 'translateY(-100%)';
@@ -64,11 +69,18 @@
 			togglePlayerUp();
 			togglePlaylist();
 		});
-
+		
+		// arrow.addEventListener('click', function(e) {
+		// 	toggleLoginUp();
+		// 	togglePlayerDown();
+		// });
+		
 		playlistTop.addEventListener('touchstart', function () {
 			togglePlayerUp();
 			togglePlaylist();
 		});
+		
+		
 
 		for (i = 0; i < menuToggles.length; i++ ) {
 			menuToggles[i].addEventListener('touchstart', toggleMenu);

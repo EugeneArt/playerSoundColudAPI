@@ -216,12 +216,17 @@ body{
 .player-trackbar{
 	width: 40%;
 	margin: 0 auto 30px auto;
+	cursor: pointer;
+}
+.player-trackbar:hover{
+	background: rgba(255, 82, 82, 0.3);;
 }
 .player-trackbar-bar{
 	display: block;
 	position: relative;
 	height: 10px;
 	background-color: #ff5252;
+	
 }
 .player-trackbar-time{
 	color: rgba(254, 95, 89, 0.9);
@@ -643,8 +648,10 @@ body{
 	z-index: 10;
 	top: 7%;
     width: 70%;
+    height: 40%; 
+	/*width: 100%;*/
+	/*height: 100%;*/
     left: 15%;
-    height: 40%;
     text-align: center;
     padding-top: 200px;
     color: #ff5252;

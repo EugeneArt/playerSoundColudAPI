@@ -32,13 +32,13 @@
             <div class="player">
             <img  src="img/tmp/album-cover.png" alt="" class="player-cover" id="trackImage">
                  <audio id="player" controls preload="auto" autoplay hidden></audio>
-                <div class="player-trackbar">
-                         <span class="player-trackbar-bar"  id="trackbar">
-                             <span class="player-trackbar-time" id="trackCurrentTime"></span>
+                <div class="player-trackbar" id="trackbar">
+                         <span class="player-trackbar-bar"  id="slider" >
+                             <span class="player-trackbar-time" id="trackCurrentTime" ></span>
                          </span>
                 </div>
                 <p class="player-title" id="trackAuthor"></p>
-                <p class="player-author" id="trackTitle" num></p>
+                <p class="player-author" id="trackTitle" data-tracknum data-playlistnum></p>
                 <div class="player-actions">
                         <span class="player-actions-button" id="shuffleBtn"><i class="icon icon__shuffle"></i></span>
                         <span class="player-actions-button" id="previousBtn"><i class="icon icon__prev"></i></span>
@@ -146,7 +146,7 @@
                 <!--</div> -->
             </div>
         </div>
-        <div class="login" id="login">
+        <div class="login" id="login" data-state="login">
             <div class="login-title">Enter login</div>
             <form name="login">
                <p><input type="text" name="name" value="denis-narush" id="loginName"></p> 

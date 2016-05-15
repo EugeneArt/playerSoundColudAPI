@@ -14,6 +14,7 @@
 		songs    		 = document.getElementById('songs'),
 		player   		 = document.getElementById('player'),
 		trackbar 	 	 = document.getElementById('trackbar'),
+		slider			 = document.getElementById('slider'),
 		trackImage 		 = document.getElementById('trackImage'),
 		trackTitle 		 = document.getElementById('trackTitle'),
 		trackAuthor 	 = document.getElementById('trackAuthor'),
@@ -46,10 +47,11 @@
 		
 		SC.get('users/'+user+'/playlists').then(function(playlists) {
 			var tracks = playlists[0].tracks;
-			selectTrack(tracks[0].id,0);
+			selectTrack(tracks[0].id,0,0);
 		});
 	}
 	
+	// player.volume = 0;
 	//Events
 	playBtn.addEventListener('click', playMusic);
 	playBtn.addEventListener('touchstart', playMusic);
@@ -83,15 +85,27 @@
 	});
 	
 	//track bar duration
-	player.addEventListener('timeupdate', function() {
+	player.addEventListener('timeupdate', moveTrackbar);
+
+	function moveTrackbar() {
 		var sec;
-	    trackbar.style.width = (player.currentTime*100/player.duration).toFixed(1)+ '%';
+	    slider.style.width = (player.currentTime*100/player.duration).toFixed(1)+ '%';
 	    
 	    sec = (player.currentTime%60).toString().split('.')[0];
 	    sec = (sec < 10 ? '0'+ sec: sec);
 	    trackCurrentTime.innerHTML = (player.currentTime/60).toString().split('.')[0] + '.' + sec;
-	})
-	
+	}
+	//rewind 
+	trackbar.onclick = function(e) {
+		var x = e.offsetX == undefined? e.layerX: e.offsetX;
+		var widthTrackbar = +getComputedStyle(trackbar).width.slice(0,-2);
+		
+		var procent = Math.floor(x*100/widthTrackbar);
+		var currentDuration = Math.floor(procent*player.duration/100);
+		
+		player.currentTime = currentDuration;
+		
+	}
 	//Add playlists 
 	function addPlaylists(user) {
 		SC.get('users/'+user+'/playlists').then(function(playlists) {
@@ -126,7 +140,7 @@
 				html += '';
 				html += '<div class="playlist-item" id="myTrack" data-tracknum="'+i+'" onclick="selectTrack('+tracks[i].id+', '+i+')" ontouchend="selectTrack('+tracks[i].id+', '+i+')">';
 					html += '<div class="playlist-item-s playlist-item-s__left">';
-						html += '<p class="playlist-item-title" > '+tracks[i].user.username+'</p>';
+						html += '<p class="playlist-item-title"> '+tracks[i].user.username+'</p>';
 						html += '<p class="playlist-item-author">'+tracks[i].title+'</p>';
 					html += '</div>';
 					html += '<div class="playlist-item-s playlist-item-s__right">';
@@ -151,7 +165,7 @@
 			for (var i = 0; i <= tracks.length; i++){
 					time.setTime(tracks[i].duration);
 					html += '';
-					html += '<div class="playlist-item" id="track" data-tracknum="'+i+'" onclick="selectTrack('+tracks[i].id+','+i+')" ontouchend="selectTrack('+tracks[i].id+','+i+')">';
+					html += '<div class="playlist-item" id="track" data-tracknum="'+i+'" onclick="selectTrack('+tracks[i].id+','+i+','+playlistNum+')" ontouchend="selectTrack('+tracks[i].id+','+i+','+playlistNum+')">';
 						html += '<div class="playlist-item-s playlist-item-s__left">';
 							html += '<p class="playlist-item-title" > '+tracks[i].user.username+'</p>';
 							html += '<p class="playlist-item-author">'+tracks[i].title+'</p>';
@@ -169,7 +183,7 @@
 	}
 	
 	//Select track on playlist
-	function selectTrack(id,i){
+	function selectTrack(id,i,playlistNum){
 		var	artworkUrl;
 		SC.get('/tracks/' + id).then(function(data){
 			player.src = data.stream_url + '?client_id=' + ID;
@@ -184,7 +198,9 @@
 			trackImage.src = artworkUrl;
 			bgImage.style.backgroundImage = "url('"+ artworkUrl +"')";
 			trackTitle.innerHTML = data.title;
-			trackTitle.setAttribute('num', i);
+			trackTitle.setAttribute('data-tracknum', i);
+			trackTitle.setAttribute('data-playlistnum', playlistNum);
+			
 			trackAuthor.innerHTML = data.user.username;
 		});
 
@@ -235,21 +251,41 @@
 	}
 	
 	function playNext() {
-		var currentTrack = +trackTitle.getAttribute('num');
+		var currentTrack = +trackTitle.getAttribute('data-tracknum');
+		var playlistNum = +trackTitle.getAttribute('data-playlistnum');
 		var user = userName.innerHTML;
-		SC.get('users/'+user+'/playlists').then(function(playlists) {
-			var tracks = playlists[1].tracks;
-			selectTrack(tracks[currentTrack+1].id, currentTrack+1);
-		});
+		console.log();
+		if (isNaN(playlistNum)) {
+			playlist = 0;
+			SC.get('users/'+user+'/tracks').then(function(tracks) {
+				selectTrack(tracks[currentTrack+1].id, currentTrack+1);
+			});
+		} else {
+			SC.get('users/'+user+'/playlists').then(function(playlists) {
+				var tracks = playlists[playlistNum].tracks;
+				
+				selectTrack(tracks[currentTrack+1].id, currentTrack+1, playlistNum);
+			});
+		}
+		
+
 	}
 	
 	function playPrevious() {
-		var currentTrack = +trackTitle.getAttribute('num');
+		var currentTrack = +trackTitle.getAttribute('data-tracknum');
+		var playlistNum = +trackTitle.getAttribute('data-playlistnum');
 		var user = userName.innerHTML;
-		SC.get('users/'+user+'/playlists').then(function(playlists) {
-			var tracks = playlists[1].tracks;
-			selectTrack(tracks[currentTrack-1].id, currentTrack-1);
+		
+		if (isNaN(playlistNum)) {
+			SC.get('users/'+user+'/tracks').then(function(tracks) {
+				selectTrack(tracks[currentTrack-1].id, currentTrack-1);
+			});
+		} else {
+			SC.get('users/'+user+'/playlists').then(function(playlists) {
+				var tracks = playlists[playlistNum].tracks;
+			selectTrack(tracks[currentTrack-1].id, currentTrack-1, playlistNum);
 		});
+		}
 	}
 	
 	function repeatMusic() {
@@ -260,5 +296,6 @@
 		shuffleBtn.firstChild.classList.toggle('icon__shuffle-active');
 
 	}
+
 	
 }());
